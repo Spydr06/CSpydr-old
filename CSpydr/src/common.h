@@ -10,16 +10,24 @@
 #ifdef NDEBUG
 #define CSPYDR_VERSION "v.0.01 release"
 #else
-#define CSPYDR_VERSION "v.0.01 debug"
 #define DEBUG_COLOR_OUTPUT
+#define CSPYDR_VERSION "v.0.01 debug"
 #define DEBUG_TRACE_EXECUTION
 #define DEBUG_PRINT_CODE
 #endif
 
 #ifdef DEBUG_COLOR_OUTPUT
-#define PRINT_ERROR(stream) fprintf(stream, "\033[1;31m");
-#define PRINT_RESET(stream) fprintf(stream, "\033[0m");
-#define PRINT_OK(stream) fprintf(stream, "\033[1;32m");
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
+#define PRINT_ERROR(stream) fprintf(stream, ANSI_COLOR_RED);
+#define PRINT_RESET(stream) fprintf(stream, ANSI_COLOR_RESET);
+#define PRINT_OK(stream) fprintf(stream, ANSI_COLOR_GREEN);
 #else
 #define PRINT_ERROR(stream) fprintf(stream, "");
 #define PRINT_RESET(stream) fprintf(stream, "");
