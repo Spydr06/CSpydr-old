@@ -34,6 +34,8 @@ void initVM()
 	defineNative("sin", sinNative);
 	defineNative("cos", cosNative);
 	defineNative("c_in", consoleInputNative);
+	defineNative("clear", clearNative);
+	defineNative("err", errorNative);
 }
 
 void freeVM()

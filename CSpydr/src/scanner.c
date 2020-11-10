@@ -182,7 +182,7 @@ static TokenType identifierType()
 	case 'p':
 		return checkKeyword(1, 4, "rint", TOKEN_PRINT);
 	case 'r':
-		return checkKeyword(1, 5, "eturn", TOKEN_RETURN);
+		return checkKeyword(1, 2, "et", TOKEN_RETURN);
 	case 's':
 		return checkKeyword(1, 4, "uper", TOKEN_SUPER);
 	case 't':
