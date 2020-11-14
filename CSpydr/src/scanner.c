@@ -279,25 +279,38 @@ Token scanToken()
 	case '.':
 		return makeToken(TOKEN_DOT);
 	case '-':
-		return makeToken(TOKEN_MINUS);
+		if (match('=')) {
+			return makeToken(TOKEN_MINUS_EQUAL);
+		}
+		else if (match('-')) {
+			return makeToken(TOKEN_MINUS_MINUS);
+		}
+		else {
+			return makeToken(TOKEN_MINUS);
+		}
 	case '+':
-		return makeToken(TOKEN_PLUS);
+		if (match('=')) {
+			return makeToken(TOKEN_PLUS_EQUAL);
+		}
+		else if (match('+')) {
+			return makeToken(TOKEN_PLUS_PLUS);
+		}
+		else {
+			return makeToken(TOKEN_PLUS);
+		}
 	case '/':
-		return makeToken(TOKEN_SLASH);
+		return makeToken(match('=') ? TOKEN_SLASH_EQUAL : TOKEN_SLASH);
 	case '*':
-		return makeToken(TOKEN_STAR);
+		return makeToken(match('=') ? TOKEN_STAR_EQUAL : TOKEN_STAR);
 	case '%':
-		return makeToken(TOKEN_PERCENT);
+		return makeToken(match('=') ? TOKEN_PRECENT_EQUAL : TOKEN_PERCENT);
 	case '^':
-		return makeToken(TOKEN_POWER);
+		return makeToken(match('=') ? TOKEN_POWER_EQUAL : TOKEN_POWER);
 	case '!':
-		return makeToken(
-			match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
+		return makeToken(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
 	case '=':
-		return makeToken(
-			match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+		return makeToken(match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
 	case '<':
-		//return makeToken( match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
 		if (match('=')) {
 			return makeToken(TOKEN_LESS_EQUAL);
 		}

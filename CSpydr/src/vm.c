@@ -26,6 +26,13 @@ void initVM()
 {
 	resetStack();
 	vm.objects = NULL;
+
+	vm.grayCount = 0;
+	vm.grayCapacity = 0;
+	vm.grayStack = NULL;
+	vm.bytesAllocated = 0;
+	vm.nextGC = 1024 * 1024;
+
 	initTable(&vm.strings);
 	initTable(&vm.globals);
 
@@ -36,6 +43,8 @@ void initVM()
 	defineNative("c_in", consoleInputNative);
 	defineNative("clear", clearNative);
 	defineNative("err", errorNative);
+	defineNative("pi", piNative);
+	defineNative("endl", endLineNative);
 }
 
 void freeVM()
@@ -220,8 +229,8 @@ static bool isFalsey(Value value)
 
 static void concatenate()
 {
-	ObjString *b = AS_STRING(pop());
-	ObjString *a = AS_STRING(pop());
+	ObjString* b = AS_STRING(peek(0));
+	ObjString* a = AS_STRING(peek(1));
 
 	int length = a->length + b->length;
 	char *chars = ALLOCATE(char, length + 1);
@@ -230,6 +239,8 @@ static void concatenate()
 	chars[length] = '\0';
 
 	ObjString *result = takeString(chars, length);
+	pop();
+	pop();
 	push(OBJ_VAL(result));
 }
 
@@ -238,11 +249,8 @@ static InterpretResult run()
 	CallFrame* frame = &vm.frames[vm.frameCount - 1];
 
 #define READ_BYTE() (*frame->ip++)
-#define READ_SHORT()									\
-	(frame->ip += 2,									\
-	(uint16_t)((frame->ip[-2] << 8) | frame->ip[-1]))
-#define READ_CONSTANT() \
-	(frame->closure->function->chunk.constants.values[READ_BYTE()])
+#define READ_SHORT() (frame->ip += 2, (uint16_t)((frame->ip[-2] << 8) | frame->ip[-1]))
+#define READ_CONSTANT() (frame->closure->function->chunk.constants.values[READ_BYTE()])
 #define READ_STRING() AS_STRING(READ_CONSTANT())
 
 #define BINARY_OP(valueType, op)                        \

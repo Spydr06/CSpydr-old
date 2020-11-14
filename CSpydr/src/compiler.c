@@ -5,6 +5,7 @@
 #include "common.h"
 #include "compiler.h"
 #include "scanner.h"
+#include "memory.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
@@ -342,6 +343,14 @@ static void binary(bool canAssign)
 	case TOKEN_GREATER_GREATER:
 		emitByte(OP_SHIFT_RIGHT);
 		break;
+	case TOKEN_PLUS_PLUS:
+		emitBytes(OP_CONSTANT, 1);
+		emitByte(OP_ADD);
+		break;
+	case TOKEN_MINUS_MINUS:
+		emitBytes(OP_CONSTANT, 1);
+		emitByte(OP_SUBTRACT);
+		break;
 	default:
 		return; // Unreachable.
 	}
@@ -450,7 +459,9 @@ ParseRule rules[] = {
 	[TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
 	[TOKEN_DOT] = {NULL, NULL, PREC_NONE},
 	[TOKEN_MINUS] = {unary, binary, PREC_TERM},
+	[TOKEN_MINUS_MINUS] = {NULL, binary, PREC_TERM},
 	[TOKEN_PLUS] = {NULL, binary, PREC_TERM},
+	[TOKEN_PLUS_PLUS] = {NULL, binary, PREC_TERM},
 	[TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE},
 	[TOKEN_SLASH] = {NULL, binary, PREC_FACTOR},
 	[TOKEN_STAR] = {NULL, binary, PREC_FACTOR},
@@ -984,4 +995,13 @@ ObjFunction* compile(const char *source)
 
 	ObjFunction* function = endCompiler();
 	return parser.hadError ? NULL : function;
+}
+
+void markCompilerRoots()
+{
+	Compiler* compiler = current;
+	while (compiler != NULL) {
+		markObject((Obj*)compiler->function);
+		compiler = compiler->enclosing;
+	}
 }

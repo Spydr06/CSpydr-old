@@ -11,6 +11,8 @@
 #include "memory.h"
 #include "vm.h"
 
+#define M_PI acos(-1.0)
+
 static Value clockNative(int argCount, Value* args)
 {
 	return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
@@ -75,6 +77,16 @@ static Value cosNative(int argCount, Value* args)
 	return NUMBER_VAL((double)cos(AS_NUMBER(args[0])));
 }
 
+static Value piNative(int argCount, Value* args)
+{
+	if (argCount != 0) {
+		runtimeError("Expect 0 arguments but got %d", argCount);
+		return NIL_VAL;
+	}
+
+	return NUMBER_VAL(M_PI);
+}
+
 static Value clearNative(int argCount, Value* args)
 {
 	if (argCount != 0) {
@@ -99,6 +111,17 @@ static Value errorNative(int argCount, Value* args)
 	printf("Error thrown: %s\n", AS_CSTRING(args[0]));
 	PRINT_RESET(stdout);
 
+	return NIL_VAL;
+}
+
+static Value endLineNative(int argCount, Value* args)
+{
+	if (argCount != 0) {
+		runtimeError("Expect 0 arguments but got %d", argCount);
+		return NIL_VAL;
+	}
+
+	printf("\n");
 	return NIL_VAL;
 }
 
