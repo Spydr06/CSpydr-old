@@ -26,6 +26,31 @@ static Obj *allocateObject(size_t size, ObjType type)
 	return object;
 }
 
+ObjBoundMethod* newBoundMethod(Value reciever, ObjClosure* method)
+{
+	ObjBoundMethod* bound = ALLOCATE_OBJ(ObjBoundMethod, OBJ_BOUND_METHOD);
+
+	bound->reciever = reciever;
+	bound->method = method;
+	return bound;
+}
+
+ObjClass* newClass(ObjString* name)
+{
+	ObjClass* _class = ALLOCATE_OBJ(ObjClass, OBJ_CLASS);
+	_class->name = name;
+	initTable(&_class->methods);
+	return _class;
+}
+
+ObjInstance* newInstance(ObjClass* _class)
+{
+	ObjInstance* instance = ALLOCATE_OBJ(ObjInstance, OBJ_INSTANCE);
+	instance->_class = _class;
+	initTable(&instance->fields);
+	return instance;
+}
+
 ObjFunction* newFunction()
 {
 	ObjFunction* function = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
@@ -121,11 +146,21 @@ void printObject(Value value)
 {
 	switch (OBJ_TYPE(value))
 	{
+	case OBJ_BOUND_METHOD:
+		printFunction(AS_BOUND_METHOD(value)->method->function);
+		break;
+	case OBJ_CLASS:
+		printf("%s", AS_CLASS(value)->name->chars);
+		break;
 	case OBJ_CLOSURE:
 		printFunction(AS_CLOSURE(value)->function);
 		break;
 	case OBJ_FUNCTION:
 		printFunction(AS_FUNCTION(value));
+		break;
+	case OBJ_INSTANCE:
+		printf("%s instance",
+			AS_INSTANCE(value)->_class->name->chars);
 		break;
 	case OBJ_NATIVE:
 		printf("<native fn>");
