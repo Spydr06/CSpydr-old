@@ -101,6 +101,10 @@ int disassembleInstruction(Chunk *chunk, int offset)
 		return byteInstruction("OP_GET_LOCAL", chunk, offset);
 	case OP_SET_LOCAL:
 		return byteInstruction("OP_SET_LOCAL", chunk, offset);
+	case OP_GET_SUPER:
+		return constantInstruction("OP_GET_SUPER", chunk, offset);
+	case OP_SUPER_INVOKE:
+		return invokeInstruction("OP_SUPER_INVOKE", chunk, offset);
 	case OP_SHIFT_LEFT:
 		return simpleInstruction("OP_BINARY_SHIFT", offset);
 	case OP_SHIFT_RIGHT:
@@ -115,6 +119,8 @@ int disassembleInstruction(Chunk *chunk, int offset)
 		return byteInstruction("OP_CALL", chunk, offset);
 	case OP_INVOKE:
 		return invokeInstruction("OP_INVOKE", chunk, offset);
+	case OP_INHERIT:
+		return simpleInstruction("OP_INHERIT", offset);
 	case OP_METHOD:
 		return constantInstruction("OP_METHOD", chunk, offset);
 	case OP_CLOSURE:
