@@ -6,12 +6,13 @@
 #include <stdint.h>
 
 #define UINT8_COUNT (UINT8_MAX + 1)
+//#define NAN_BOXING
 
 #ifdef NDEBUG
-#define CSPYDR_VERSION "v.0.01 release"
+#define CSPYDR_VERSION "v1.0 (alpha) release"
 #else
 #define DEBUG_COLOR_OUTPUT
-#define CSPYDR_VERSION "v.0.01 debug"
+#define CSPYDR_VERSION "v1.0 (alpha) debug"
 #define DEBUG_TRACE_EXECUTION
 #define DEBUG_PRINT_CODE
 //#define DEBUG_STRESS_GC
