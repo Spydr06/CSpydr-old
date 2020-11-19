@@ -84,7 +84,7 @@ int main(int argc, const char *argv[])
 	}
 	else if (argc == 2)
 	{
-		printf("Compiling %s ...", argv[1]);
+		printf("Compiling %s ...\n", argv[1]);
 		runFile(argv[1]);
 		system("pause");
 	}
