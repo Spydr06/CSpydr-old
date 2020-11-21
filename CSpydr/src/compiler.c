@@ -199,6 +199,11 @@ static void emitReturn()
 	emitByte(OP_RETURN);
 }
 
+static void emitBreak()
+{
+
+}
+
 static int emitJump(uint8_t instruction)
 {
 	emitByte(instruction);
@@ -986,6 +991,12 @@ static void returnStatement()
 	}
 }
 
+static void breakStatement()
+{
+	emitBreak();
+	consume(TOKEN_SEMICOLON, "Expect ';' after return value.");
+}
+
 static void whileStatement()
 {
 	int loopStart = currentChunk()->count;
@@ -998,7 +1009,6 @@ static void whileStatement()
 
 	emitByte(OP_POP);
 	statement();
-
 	emitLoop(loopStart);
 
 	patchJump(exitJump);
@@ -1117,6 +1127,9 @@ static void statement()
 	} 
 	else if (match(TOKEN_RETURN)) {
 		returnStatement();
+	}
+	else if (match(TOKEN_BREAK)) {
+		breakStatement();
 	}
 	else if (match(TOKEN_WHILE)) {
 		whileStatement();

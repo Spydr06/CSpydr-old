@@ -184,9 +184,6 @@ static bool callValue(Value callee, int argCount)
 		case OBJ_CLOSURE:
 			return call(AS_CLOSURE(callee), argCount);
 
-		case OBJ_FUNCTION:
-			return call(AS_FUNCTION(callee), argCount);
-
 		case OBJ_NATIVE:
 		{
 			NativeFn native = AS_NATIVE(callee);
@@ -200,13 +197,16 @@ static bool callValue(Value callee, int argCount)
 			return true;
 		}
 
+		case OBJ_FUNCTION:
+			return call(AS_FUNCTION(callee), argCount);
+
 		default:
 			//Non-callable object type.
 			break;
 		}
 	}
 
-	runtimeError("Can only call functiond and classes.");
+	runtimeError("Can only call functions and classes.");
 	return false;
 }
 
