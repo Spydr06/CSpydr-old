@@ -323,6 +323,23 @@ static void concatenate()
 	push(OBJ_VAL(result));
 }
 
+static ObjString* doubleToObjString(double in)
+{
+	int length = sizeof(double) * 24;
+	char* charArray = ALLOCATE(char, length);
+	sprintf(charArray, "%g", in);
+
+	return takeString(charArray, length);
+}
+
+static ObjString* boolToObjString(bool in)
+{
+	int length = sizeof(char) * (in ? 4 : 5);
+	char* charArray = (in ? "true" : "false");
+
+	return takeString(charArray, length);
+}
+
 static InterpretResult run()
 {
 	CallFrame* frame = &vm.frames[vm.frameCount - 1];
@@ -500,24 +517,67 @@ static InterpretResult run()
 
 		case OP_GET_PROPERTY:
 		{
-			if (!IS_INSTANCE(peek(0))) {
-				//add string functions here.
-				//add variable name getters here.
-				runtimeError("Only instances have properties.");
-				return INTERPRET_RUNTIME_ERROR;
-			}
-
-			ObjInstance* instance = AS_INSTANCE(peek(0));
+			Value value = peek(0);
 			ObjString* name = READ_STRING();
 
-			Value value;
-			if (tableGet(&instance->fields, name, &value)) {
-				pop(); //Instance.
-				push(value);
+			switch (value.type) {
+			case VAL_NUMBER:
+			{
+				if (strcmp(name->chars, "to_str") == 0) {
+					pop();
+					push(OBJ_VAL(doubleToObjString(AS_NUMBER(value))));
+				}
+				else {
+					runtimeError("Unknown number property %s.", name->chars);
+					return INTERPRET_RUNTIME_ERROR;
+				}
+				break;
+			}
+			case VAL_BOOL:
+			{
+				if (strcmp(name->chars, "to_str") == 0) {
+					pop();
+					push(OBJ_VAL(boolToObjString(AS_BOOL(value))));
+				}
+				else {
+					runtimeError("Unknown bool property %s.", name->chars);
+					return INTERPRET_RUNTIME_ERROR;
+				}
+				break;
+			}
+			case VAL_NIL:
+			{
+				if (strcmp(name->chars, "to_str") == 0) {
+					pop();
+					push(OBJ_VAL(takeString("nil", 3)));
+				}
+				else {
+					runtimeError("Unknown nil property %s.", name->chars);
+					return INTERPRET_RUNTIME_ERROR;
+				}
+				break;
+			}
+			case VAL_OBJ:
+			{
+				if (IS_INSTANCE(value)) {
+					ObjInstance* instance = AS_INSTANCE(value);
+
+					Value value;
+					if (tableGet(&instance->fields, name, &value)) {
+						pop(); //Instance.
+						push(value);
+						break;
+					}
+
+					if (!bindMethod(instance->_class, name)) {
+						return INTERPRET_RUNTIME_ERROR;
+					}
+				}
 				break;
 			}
 
-			if (!bindMethod(instance->_class, name)) {
+			default:
+				runtimeError("Unknown property %s.", name->chars);
 				return INTERPRET_RUNTIME_ERROR;
 			}
 			break;
