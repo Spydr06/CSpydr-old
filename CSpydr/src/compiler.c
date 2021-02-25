@@ -541,9 +541,20 @@ static void unary(bool canAssign)
 	}
 }
 
+static void arrayIndex(bool canAssign)
+{
+	parsePrecedence(PREC_CALL);
+
+	expression();
+	emitByte(OP_GET_ARRAY_INDEX);
+	consume(TOKEN_RIGHT_BRACKET, "Expect ']' after array index.");
+}
+
 ParseRule rules[] = {
 	[TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL},
 	[TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
+	[TOKEN_LEFT_BRACKET] = {NULL, arrayIndex, PREC_CALL },
+	[TOKEN_RIGHT_BRACKET] = {NULL, NULL, PREC_NONE},
 	[TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
 	[TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
 	[TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
@@ -747,6 +758,21 @@ static void defineVariable(uint8_t global, bool isConstant)
 	}
 }
 
+static void defineArray(uint8_t* globals, bool isConstant)
+{
+	if (current->scopeDepth > 0) {
+		markInitialized();
+		return;
+	}
+
+	if (isConstant) {
+		emitBytes(OP_DEFINE_CONSTANT, &globals);
+	}
+	else {
+		emitBytes(OP_DEFINE_GLOBAL, &globals);
+	}
+}
+
 static uint8_t argumentList()
 {
 	uint8_t argCount = 0;
@@ -826,6 +852,15 @@ static void synchronize()
 static void expression()
 {
 	parsePrecedence(PREC_ASSIGNMENT);
+}
+
+static void arrayStatement()
+{
+	do {
+		expression();
+	} while (match(TOKEN_COMMA));
+
+	consume(TOKEN_RIGHT_BRACKET, "Expect ']' after array expression.");
 }
 
 static void block()
@@ -954,7 +989,12 @@ static void varDeclaration(bool isConstant)
 	uint8_t global = parseVariable("Expect variable name.");
 
 	if (match(TOKEN_EQUAL)) {
-		expression();
+		if (match(TOKEN_LEFT_BRACKET)) {
+			arrayStatement();
+		}
+		else {
+			expression();
+		}
 	}
 	else {
 		emitByte(OP_NIL);
