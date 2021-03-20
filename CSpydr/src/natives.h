@@ -11,6 +11,7 @@
 #include "memory.h"
 #include "vm.h"
 
+
 #define M_PI acos(-1.0)
 
 static Value clockNative(int argCount, Value* args)
@@ -24,7 +25,7 @@ static Value consoleInputNative(int argCount, Value* args)
 		runtimeError("Expect 1 arguments but got %d.", argCount);
 		return NIL_VAL;
 	}
-	scannerIsMuted = true;
+	bool scannerIsMuted = true;
 
 	char* input = malloc(sizeof(char) * (int) AS_NUMBER(args[0]));
 	scanf("%s", input);

@@ -8,6 +8,8 @@
 #include "debug.h"
 #include "vm.h"
 
+bool scannerIsMuted;
+
 static void repl()
 {
 	printf("Starting in repl compile mode.\n");

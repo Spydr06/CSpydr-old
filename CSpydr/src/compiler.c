@@ -652,7 +652,7 @@ static bool identifiersEqual(Token* a, Token* b)
 	return memcmp(a->start, b->start, a->length) == 0;
 }
 
-static int resolveLocal(Compiler* compiler, Token* name)
+int resolveLocal(Compiler* compiler, Token* name)
 {
 	for (int i = compiler->localCount - 1; i >= 0; i--) {
 		Local* local = &compiler->locals[i];
@@ -688,7 +688,7 @@ static int addUpvalue(Compiler* compiler, uint8_t index, bool isLocal)
 	return compiler->function->upvalueCount++;
 }
 
-static int resolveUpvalue(Compiler* compiler, Token* name)
+int resolveUpvalue(Compiler* compiler, Token* name)
 {
 	if (compiler->enclosing == NULL) return -1;
 

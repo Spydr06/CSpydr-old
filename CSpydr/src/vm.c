@@ -79,7 +79,7 @@ static void resetStack()
 	vm.openUpvalues = NULL;
 }
 
-static void runtimeError(const char *format, ...)
+void runtimeError(const char *format, ...)
 {
 	PRINT_ERROR(stderr);
 	va_list args;

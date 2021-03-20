@@ -41,6 +41,6 @@
 #define PRINT_OK(stream) fprintf(stream, "");
 #endif
 
-bool scannerIsMuted;
+//bool scannerIsMuted;
 
 #endif
